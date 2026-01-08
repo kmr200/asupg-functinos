@@ -1,0 +1,47 @@
+package org.asupg.functions;
+
+import com.microsoft.azure.functions.ExecutionContext;
+import com.microsoft.azure.functions.annotation.BindingName;
+import com.microsoft.azure.functions.annotation.BlobTrigger;
+import com.microsoft.azure.functions.annotation.FunctionName;
+import org.asupg.functions.service.ExcelParserService;
+
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+
+/**
+ * Azure Functions with Azure Blob trigger.
+ */
+public class BlobTriggerJava {
+
+    private final ExcelParserService excelParserService;
+
+    @Inject
+    public BlobTriggerJava(ExcelParserService excelParserService) {
+        this.excelParserService = excelParserService;
+    }
+
+    /**
+     * This function will be invoked when a new or updated blob is detected at the specified path. The blob contents are provided as input to this function.
+     */
+    @FunctionName("BlobTriggerJava")
+    public void run(
+            @BlobTrigger(
+                    name = "content",
+                    path = "reports/{name}",
+                    dataType = "binary",
+                    connection = "AzureWebJobsStorage"
+            ) byte[] content,
+            @BindingName("name") String name,
+            final ExecutionContext context
+    ) {
+        context.getLogger().info("Parsing file: " + name);
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
+            excelParserService.parse(inputStream);
+            context.getLogger().info("Successfully parsed file: " + name);
+        } catch (Exception e) {
+            context.getLogger().severe("Error parsing file: " + e.getMessage());
+            throw new RuntimeException(e);
+        };
+    }
+}
