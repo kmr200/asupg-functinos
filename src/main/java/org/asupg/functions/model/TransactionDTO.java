@@ -1,20 +1,38 @@
 package org.asupg.functions.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class TransactionDTO {
 
+    @JsonProperty("id")
+    private String id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
+
     private String transactionId;
+
     private String counterpartyName;
+
     private String counterpartyInn;
+
     private String accountNumber;
+
     private String mfo;
+
     private BigDecimal amount;
+
     private String description;
-    private ReconciliationDto reconciliation;
+
+    private ReconciliationDTO reconciliation;
+
+    @JsonProperty("_etag")
+    private String etag;
 
     public TransactionDTO() {}
 
@@ -27,8 +45,9 @@ public class TransactionDTO {
             String mfo,
             BigDecimal amount,
             String description,
-            ReconciliationDto reconciliation
+            ReconciliationDTO reconciliation
     ) {
+        this.id = transactionId;
         this.date = date;
         this.transactionId = transactionId;
         this.counterpartyName = counterpartyName;
@@ -38,6 +57,15 @@ public class TransactionDTO {
         this.amount = amount;
         this.description = description;
         this.reconciliation = reconciliation;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this.transactionId = id;
     }
 
     public LocalDate getDate() {
@@ -53,7 +81,8 @@ public class TransactionDTO {
     }
 
     public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+        this.id = id;
+        this.transactionId = id;
     }
 
     public String getCounterpartyName() {
@@ -104,12 +133,20 @@ public class TransactionDTO {
         this.description = description;
     }
 
-    public ReconciliationDto getReconciliation() {
+    public ReconciliationDTO getReconciliation() {
         return reconciliation;
     }
 
-    public void setReconciliation(ReconciliationDto reconciliation) {
+    public void setReconciliation(ReconciliationDTO reconciliation) {
         this.reconciliation = reconciliation;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
     }
 
     @Override
@@ -127,7 +164,8 @@ public class TransactionDTO {
     @Override
     public String toString() {
         return "TransactionDTO{" +
-                "date=" + date +
+                "id='" + id + '\'' +
+                ", date=" + date +
                 ", transactionId='" + transactionId + '\'' +
                 ", counterpartyName='" + counterpartyName + '\'' +
                 ", counterpartyInn='" + counterpartyInn + '\'' +

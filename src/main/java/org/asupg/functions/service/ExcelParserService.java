@@ -2,7 +2,7 @@ package org.asupg.functions.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.asupg.functions.model.ReconciliationDto;
+import org.asupg.functions.model.ReconciliationDTO;
 import org.asupg.functions.model.ReconciliationStatus;
 import org.asupg.functions.model.TransactionDTO;
 import org.asupg.functions.repository.CosmosTransactionRepository;
@@ -190,7 +190,7 @@ public class ExcelParserService {
                 mfo,
                 amount,
                 description,
-                new ReconciliationDto(ReconciliationStatus.PENDING)
+                new ReconciliationDTO(ReconciliationStatus.PENDING)
         );
 
     }

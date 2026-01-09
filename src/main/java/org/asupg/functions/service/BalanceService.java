@@ -42,10 +42,10 @@ public class BalanceService {
         // If company was found update company balance and update status to FOUND
         Set<String> foundCompaniesInn = lookupResult.companiesToUpdate()
                 .stream()
-                .map(CompanyDto::getInn)
+                .map(CompanyDTO::getInn)
                 .collect(Collectors.toSet());
 
-        List<CompanyDto> companiesToUpdate = lookupResult.companiesToUpdate();
+        List<CompanyDTO> companiesToUpdate = lookupResult.companiesToUpdate();
 
         Map<String, List<TransactionDTO>> transactionsByInn =
                 transactions.stream()
@@ -53,7 +53,7 @@ public class BalanceService {
                         .collect(Collectors.groupingBy(TransactionDTO::getCounterpartyInn));
 
 
-        for (CompanyDto company : companiesToUpdate) {
+        for (CompanyDTO company : companiesToUpdate) {
             String inn = company.getInn();
 
             List<TransactionDTO> companyTransactions =
@@ -76,14 +76,14 @@ public class BalanceService {
 
         transactions.stream()
                 .filter(transaction -> foundCompaniesInn.contains(transaction.getCounterpartyInn()))
-                .forEach(transaction -> transaction.setReconciliation(new ReconciliationDto(ReconciliationStatus.MATCHED)));
+                .forEach(transaction -> transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.MATCHED)));
 
         // If company was NOT found update status to NOT_FOUND
         Set<String> notFoundCompaniesInn = new HashSet<>(lookupResult.notFoundCompanies());
 
         transactions.stream()
                 .filter(transaction -> notFoundCompaniesInn.contains(transaction.getCounterpartyInn()))
-                .forEach(transaction -> transaction.setReconciliation(new  ReconciliationDto(ReconciliationStatus.NOT_FOUND)));
+                .forEach(transaction -> transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.NOT_FOUND)));
 
         cosmosTransactionRepository.bulkUpdateTransactions(transactions);
 

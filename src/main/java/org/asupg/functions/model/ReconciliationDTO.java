@@ -1,26 +1,36 @@
 package org.asupg.functions.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class ReconciliationDto {
+public class ReconciliationDTO {
 
     private ReconciliationStatus status;
-    private Instant processedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime processedAt;
+
     private String failureReason;
+
     private boolean manual;
+
     private String updatedBy;
-    private Instant updatedAt;
 
-    public ReconciliationDto() {}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime updatedAt;
 
-    public ReconciliationDto(ReconciliationStatus status) {
+    public ReconciliationDTO() {}
+
+    public ReconciliationDTO(ReconciliationStatus status) {
         this.status = status;
-        this.processedAt = Instant.now();
+        this.processedAt = LocalDateTime.now();
         manual = false;
     }
 
-    public ReconciliationDto(ReconciliationStatus status, Instant processedAt, String failureReason, boolean manual, String updatedBy, Instant updatedAt) {
+    public ReconciliationDTO(ReconciliationStatus status, LocalDateTime processedAt, String failureReason, boolean manual, String updatedBy, LocalDateTime updatedAt) {
         this.status = status;
         this.processedAt = processedAt;
         this.failureReason = failureReason;
@@ -37,11 +47,11 @@ public class ReconciliationDto {
         this.status = status;
     }
 
-    public Instant getProcessedAt() {
+    public LocalDateTime getProcessedAt() {
         return processedAt;
     }
 
-    public void setProcessedAt(Instant processedAt) {
+    public void setProcessedAt(LocalDateTime processedAt) {
         this.processedAt = processedAt;
     }
 
@@ -69,18 +79,18 @@ public class ReconciliationDto {
         this.updatedBy = updatedBy;
     }
 
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        ReconciliationDto that = (ReconciliationDto) o;
+        ReconciliationDTO that = (ReconciliationDTO) o;
         return manual == that.manual && status == that.status && Objects.equals(processedAt, that.processedAt) && Objects.equals(failureReason, that.failureReason) && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(updatedAt, that.updatedAt);
     }
 

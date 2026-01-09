@@ -3,8 +3,6 @@ package org.asupg.functions.repository;
 import com.azure.cosmos.*;
 import com.azure.cosmos.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.asupg.functions.model.CompanyDto;
 import org.asupg.functions.model.TransactionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +10,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class CosmosTransactionRepository {
@@ -49,9 +44,8 @@ public class CosmosTransactionRepository {
 
         List<CosmosItemOperation> operations = transactions.stream()
                 .map(transaction -> {
-                    ObjectNode document = buildDocument(transaction, true);
                     return CosmosBulkOperations.getCreateItemOperation(
-                            document,
+                            transaction,
                             new PartitionKey(transaction.getDate().toString()),
                             transaction
                     );
@@ -98,10 +92,9 @@ public class CosmosTransactionRepository {
 
         List<CosmosItemOperation> operations = transactions.stream()
                 .map(transaction -> {
-                    ObjectNode document = buildDocument(transaction, false);
                     return CosmosBulkOperations.getReplaceItemOperation(
-                            transaction.getTransactionId(),
-                            document,
+                            transaction.getId(),
+                            transaction,
                             new PartitionKey(transaction.getDate().toString()),
                             transaction
                     );
@@ -136,49 +129,6 @@ public class CosmosTransactionRepository {
 
         logger.info("Bulk operation complete. Saved: {}, Duplicates: {}, Errors: {}", successfullySaved.size(), duplicateCount, errorCount);
         return successfullySaved;
-    }
-
-    private ObjectNode buildDocument(TransactionDTO transaction, boolean isCreateOperation) {
-        ObjectNode document = objectMapper.createObjectNode();
-
-        document.put("id", transaction.getTransactionId());
-
-        // Partition key
-        document.put("date", transaction.getDate().toString());
-
-        // Keep transactionId for clarity/querying
-        document.put("transactionId", transaction.getTransactionId());
-
-        // Other fields
-        if (transaction.getCounterpartyName() != null) {
-            document.put("counterpartyName", transaction.getCounterpartyName());
-        }
-        if (transaction.getCounterpartyInn() != null) {
-            document.put("counterpartyInn", transaction.getCounterpartyInn());
-        }
-        if (transaction.getAccountNumber() != null) {
-            document.put("accountNumber", transaction.getAccountNumber());
-        }
-        if (transaction.getMfo() != null) {
-            document.put("mfo", transaction.getMfo());
-        }
-        if (transaction.getAmount() != null) {
-            document.put("amount", transaction.getAmount());
-        }
-        if (transaction.getDescription() != null) {
-            document.put("description", transaction.getDescription());
-        }
-
-        if (transaction.getReconciliation() != null) {
-            document.set("reconciliation", objectMapper.valueToTree(transaction.getReconciliation()));
-        }
-
-        // Metadata
-        if (isCreateOperation) {
-            document.put("createdAt", System.currentTimeMillis());
-        }
-
-        return document;
     }
 
 }

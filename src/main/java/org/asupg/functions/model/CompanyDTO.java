@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class CompanyDto {
+public class CompanyDTO {
 
     @JsonProperty("id")
     private String id;
@@ -38,9 +38,9 @@ public class CompanyDto {
     @JsonProperty("_etag")
     private String etag;
 
-    public CompanyDto() {}
+    public CompanyDTO() {}
 
-    public CompanyDto(
+    public CompanyDTO(
             String inn,
             String name,
             BigDecimal monthlyRate,
@@ -166,7 +166,7 @@ public class CompanyDto {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        CompanyDto that = (CompanyDto) o;
+        CompanyDTO that = (CompanyDTO) o;
         return Objects.equals(inn, that.inn);
     }
 
@@ -178,6 +178,7 @@ public class CompanyDto {
     @Override
     public String toString() {
         return "CompanyDto{" +
+                "id='" + id + '\'' +
                 ", inn='" + inn + '\'' +
                 ", name='" + name + '\'' +
                 ", monthlyRate=" + monthlyRate +
@@ -188,6 +189,7 @@ public class CompanyDto {
                 ", status=" + status +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
+                ", etag='" + etag + '\'' +
                 '}';
     }
 }

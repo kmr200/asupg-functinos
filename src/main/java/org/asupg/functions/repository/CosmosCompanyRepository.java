@@ -7,7 +7,7 @@ import com.azure.cosmos.models.CosmosItemOperation;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.asupg.functions.model.CompanyDto;
+import org.asupg.functions.model.CompanyDTO;
 import org.asupg.functions.model.CompanyLookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +37,13 @@ public class CosmosCompanyRepository {
     }
 
     public CompanyLookupResult getCompaniesToUpdate(Set<String> listOfCompanyInn) {
-        List<CompanyDto> companiesToUpdate = new ArrayList<>();
+        List<CompanyDTO> companiesToUpdate = new ArrayList<>();
         List<String> notFoundCompanies = new ArrayList<>();
 
         for (String inn : listOfCompanyInn) {
             try {
-                CompanyDto company = cosmosContainer
-                        .readItem(inn, new PartitionKey(inn), CompanyDto.class)
+                CompanyDTO company = cosmosContainer
+                        .readItem(inn, new PartitionKey(inn), CompanyDTO.class)
                         .getItem();
 
                 companiesToUpdate.add(company);
@@ -58,13 +58,11 @@ public class CosmosCompanyRepository {
         }
 
         logger.info("Companies to update {}, companies not found: {}", companiesToUpdate.size(), notFoundCompanies.size());
-        logger.info(companiesToUpdate.toString());
-        logger.info(notFoundCompanies.toString());
 
         return new CompanyLookupResult(companiesToUpdate, notFoundCompanies);
     }
 
-    public void bulkUpdateCompanies(List<CompanyDto> companiesToUpdate) {
+    public void bulkUpdateCompanies(List<CompanyDTO> companiesToUpdate) {
 
         if (companiesToUpdate.isEmpty()) {
             logger.info("Company list is empty");
