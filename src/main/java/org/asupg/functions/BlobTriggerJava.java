@@ -4,10 +4,14 @@ import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.annotation.BindingName;
 import com.microsoft.azure.functions.annotation.BlobTrigger;
 import com.microsoft.azure.functions.annotation.FunctionName;
+import org.asupg.functions.model.TransactionDTO;
+import org.asupg.functions.repository.CosmosTransactionRepository;
+import org.asupg.functions.service.BalanceService;
 import org.asupg.functions.service.ExcelParserService;
 
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 /**
  * Azure Functions with Azure Blob trigger.
@@ -15,10 +19,12 @@ import java.io.ByteArrayInputStream;
 public class BlobTriggerJava {
 
     private final ExcelParserService excelParserService;
+    private final BalanceService balanceService;
 
     @Inject
-    public BlobTriggerJava(ExcelParserService excelParserService) {
+    public BlobTriggerJava(ExcelParserService excelParserService, BalanceService balanceService) {
         this.excelParserService = excelParserService;
+        this.balanceService = balanceService;
     }
 
     /**
@@ -37,8 +43,14 @@ public class BlobTriggerJava {
     ) {
         context.getLogger().info("Parsing file: " + name);
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
-            excelParserService.parse(inputStream);
+
+            //Parse transactions
+            List<TransactionDTO> transactions = excelParserService.parse(inputStream);
             context.getLogger().info("Successfully parsed file: " + name);
+
+            //Update balance
+            balanceService.bulkUpdateBalance(transactions);
+
         } catch (Exception e) {
             context.getLogger().severe("Error parsing file: " + e.getMessage());
             throw new RuntimeException(e);

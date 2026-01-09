@@ -14,6 +14,7 @@ public class TransactionDTO {
     private String mfo;
     private BigDecimal amount;
     private String description;
+    private ReconciliationDto reconciliation;
 
     public TransactionDTO() {}
 
@@ -25,7 +26,8 @@ public class TransactionDTO {
             String accountNumber,
             String mfo,
             BigDecimal amount,
-            String description
+            String description,
+            ReconciliationDto reconciliation
     ) {
         this.date = date;
         this.transactionId = transactionId;
@@ -35,6 +37,7 @@ public class TransactionDTO {
         this.mfo = mfo;
         this.amount = amount;
         this.description = description;
+        this.reconciliation = reconciliation;
     }
 
     public LocalDate getDate() {
@@ -101,9 +104,16 @@ public class TransactionDTO {
         this.description = description;
     }
 
+    public ReconciliationDto getReconciliation() {
+        return reconciliation;
+    }
+
+    public void setReconciliation(ReconciliationDto reconciliation) {
+        this.reconciliation = reconciliation;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TransactionDTO that = (TransactionDTO) o;
         return Objects.equals(transactionId, that.transactionId);
@@ -111,7 +121,7 @@ public class TransactionDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(transactionId);
+        return Objects.hashCode(transactionId);
     }
 
     @Override
@@ -125,6 +135,7 @@ public class TransactionDTO {
                 ", mfo='" + mfo + '\'' +
                 ", amount=" + amount +
                 ", description='" + description + '\'' +
+                ", reconciliation=" + reconciliation +
                 '}';
     }
 }

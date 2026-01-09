@@ -2,7 +2,10 @@ package org.asupg.functions.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.asupg.functions.model.ReconciliationDto;
+import org.asupg.functions.model.ReconciliationStatus;
 import org.asupg.functions.model.TransactionDTO;
+import org.asupg.functions.repository.CosmosTransactionRepository;
 import org.asupg.functions.util.ConstantsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +29,14 @@ public class ExcelParserService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelParserService.class);
 
-    private final CosmosDbService  cosmosDbService;
+    private final CosmosTransactionRepository cosmosTransactionRepository;
 
     @Inject
-    public ExcelParserService(CosmosDbService cosmosDbService) {
-        this.cosmosDbService = cosmosDbService;
+    public ExcelParserService(CosmosTransactionRepository cosmosTransactionRepository) {
+        this.cosmosTransactionRepository = cosmosTransactionRepository;
     }
 
-    public void parse(InputStream stream) {
+    public List<TransactionDTO> parse(InputStream stream) {
         try (Workbook workbook = new XSSFWorkbook(stream)) {
             Sheet sheet = workbook.getSheetAt(0);
 
@@ -53,8 +56,11 @@ public class ExcelParserService {
                 transactions.add(transaction);
             }
 
-            cosmosDbService.bulkSaveTransaction(transactions);
+            //Save transactions
+            List<TransactionDTO> savedTransactions = cosmosTransactionRepository.bulkSaveTransaction(transactions);
+            logger.info("Successfully saved transactions: " + savedTransactions.size());
 
+            return savedTransactions;
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse excel", e);
         }
@@ -183,7 +189,8 @@ public class ExcelParserService {
                 accountNumber,
                 mfo,
                 amount,
-                description
+                description,
+                new ReconciliationDto(ReconciliationStatus.PENDING)
         );
 
     }
