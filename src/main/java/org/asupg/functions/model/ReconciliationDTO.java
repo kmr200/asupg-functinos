@@ -30,6 +30,13 @@ public class ReconciliationDTO {
         manual = false;
     }
 
+    public ReconciliationDTO(ReconciliationStatus status, String failureReason) {
+        this.status = status;
+        this.failureReason = failureReason;
+        this.processedAt = LocalDateTime.now();
+        manual = false;
+    }
+
     public ReconciliationDTO(ReconciliationStatus status, LocalDateTime processedAt, String failureReason, boolean manual, String updatedBy, LocalDateTime updatedAt) {
         this.status = status;
         this.processedAt = processedAt;

@@ -1,9 +1,10 @@
 package org.asupg.functions.model;
 
 import java.util.List;
+import java.util.Set;
 
 public record CompanyLookupResult(
         List<CompanyDTO> companiesToUpdate,
-        List<String> notFoundCompanies
+        Set<String> notFoundCompanies
         ) {
 }

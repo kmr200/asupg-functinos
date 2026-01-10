@@ -91,14 +91,12 @@ public class CosmosTransactionRepository {
         logger.info("Starting bulk update of {} transactions",  transactions.size());
 
         List<CosmosItemOperation> operations = transactions.stream()
-                .map(transaction -> {
-                    return CosmosBulkOperations.getReplaceItemOperation(
-                            transaction.getId(),
-                            transaction,
-                            new PartitionKey(transaction.getDate().toString()),
-                            transaction
-                    );
-                }).toList();
+                .map(transaction -> CosmosBulkOperations.getReplaceItemOperation(
+                        transaction.getId(),
+                        transaction,
+                        new PartitionKey(transaction.getDate().toString()),
+                        transaction
+                )).toList();
 
         Iterable<CosmosBulkOperationResponse<Object>> responses = transactionsContainer.executeBulkOperations(operations);
 

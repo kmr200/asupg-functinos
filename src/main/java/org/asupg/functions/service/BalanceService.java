@@ -7,6 +7,7 @@ import org.asupg.functions.repository.CosmosTransactionRepository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class BalanceService {
         // Lookup companies
         CompanyLookupResult lookupResult = cosmosCompanyRepository.getCompaniesToUpdate(listOfCompanyInn);
 
-        // If company was found update company balance and update status to FOUND
+        // If company was found update company balance
         Set<String> foundCompaniesInn = lookupResult.companiesToUpdate()
                 .stream()
                 .map(CompanyDTO::getInn)
@@ -69,21 +70,43 @@ public class BalanceService {
                 }
             }
 
+            company.setLastPaymentDate(LocalDate.now());
+
             company.setTotalPaid(total);
         }
 
-        cosmosCompanyRepository.bulkUpdateCompanies(companiesToUpdate);
+        // Update Transactions accordingly
+        Set<String> failedToUpdateCompaniesInn = cosmosCompanyRepository.bulkUpdateCompanies(companiesToUpdate)
+                .stream()
+                .map(CompanyDTO::getInn)
+                .collect(Collectors.toSet());
 
-        transactions.stream()
-                .filter(transaction -> foundCompaniesInn.contains(transaction.getCounterpartyInn()))
-                .forEach(transaction -> transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.MATCHED)));
+        Set<String> notFoundCompaniesInn = lookupResult.notFoundCompanies();
 
-        // If company was NOT found update status to NOT_FOUND
-        Set<String> notFoundCompaniesInn = new HashSet<>(lookupResult.notFoundCompanies());
+        for (TransactionDTO transaction : transactions) {
+            String inn = transaction.getCounterpartyInn();
 
-        transactions.stream()
-                .filter(transaction -> notFoundCompaniesInn.contains(transaction.getCounterpartyInn()))
-                .forEach(transaction -> transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.NOT_FOUND)));
+            if (inn == null || inn.isBlank()) {
+                transaction.setReconciliation(
+                        new ReconciliationDTO(
+                                ReconciliationStatus.ERROR,
+                                "Missing counterparty INN"
+                        )
+                );
+                continue;
+            }
+
+            if (failedToUpdateCompaniesInn.contains(inn)) {
+                // If an error occurred while updating Company balance, reflect it in Transaction
+                transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.ERROR, "Failed to update company balance"));
+            }else if (foundCompaniesInn.contains(inn)) {
+                // If company balance was updated successfully, reflect it in Transaction
+                transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.MATCHED));
+            } else if (notFoundCompaniesInn.contains(inn)) {
+                // If company was not found, reflect it in Transaction
+                transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.NOT_FOUND));
+            }
+        }
 
         cosmosTransactionRepository.bulkUpdateTransactions(transactions);
 
