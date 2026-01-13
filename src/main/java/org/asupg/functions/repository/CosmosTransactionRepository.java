@@ -43,13 +43,11 @@ public class CosmosTransactionRepository {
         logger.info("Starting bulk save of {} transactions",  transactions.size());
 
         List<CosmosItemOperation> operations = transactions.stream()
-                .map(transaction -> {
-                    return CosmosBulkOperations.getCreateItemOperation(
-                            transaction,
-                            new PartitionKey(transaction.getDate().toString()),
-                            transaction
-                    );
-                }).toList();
+                .map(transaction -> CosmosBulkOperations.getCreateItemOperation(
+                        transaction,
+                        new PartitionKey(transaction.getCounterpartyInn()),
+                        transaction
+                )).toList();
 
         Iterable<CosmosBulkOperationResponse<Object>> responses = transactionsContainer.executeBulkOperations(operations);
 
@@ -94,7 +92,7 @@ public class CosmosTransactionRepository {
                 .map(transaction -> CosmosBulkOperations.getReplaceItemOperation(
                         transaction.getId(),
                         transaction,
-                        new PartitionKey(transaction.getDate().toString()),
+                        new PartitionKey(transaction.getCounterpartyInn()),
                         transaction
                 )).toList();
 

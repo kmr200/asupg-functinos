@@ -120,6 +120,7 @@ public class DaggerModule {
                 .key(cosmosKey)
                 .consistencyLevel(ConsistencyLevel.SESSION)
                 .contentResponseOnWriteEnabled(false)
+                .gatewayMode()
                 .buildClient();
     }
 

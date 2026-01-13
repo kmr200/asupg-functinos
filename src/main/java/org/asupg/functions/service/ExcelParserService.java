@@ -190,7 +190,7 @@ public class ExcelParserService {
                 mfo,
                 amount,
                 description,
-                new ReconciliationDTO(ReconciliationStatus.PENDING)
+                TransactionDTO.TransactionType.BANK_PAYMENT
         );
 
     }

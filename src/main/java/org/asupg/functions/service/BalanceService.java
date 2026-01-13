@@ -7,8 +7,7 @@ import org.asupg.functions.repository.CosmosTransactionRepository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,9 +59,9 @@ public class BalanceService {
             List<TransactionDTO> companyTransactions =
                     transactionsByInn.getOrDefault(inn, List.of());
 
-            BigDecimal total = company.getTotalPaid() == null
+            BigDecimal total = company.getCurrentBalance() == null
                     ? BigDecimal.ZERO
-                    : company.getTotalPaid();
+                    : company.getCurrentBalance();
 
             for (TransactionDTO transaction : companyTransactions) {
                 if (transaction.getAmount() != null) {
@@ -70,9 +69,9 @@ public class BalanceService {
                 }
             }
 
-            company.setLastPaymentDate(LocalDate.now());
+            company.setBalanceUpdatedAt(LocalDateTime.now());
 
-            company.setTotalPaid(total);
+            company.setCurrentBalance(total);
         }
 
         // Update Transactions accordingly
@@ -99,7 +98,7 @@ public class BalanceService {
             if (failedToUpdateCompaniesInn.contains(inn)) {
                 // If an error occurred while updating Company balance, reflect it in Transaction
                 transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.ERROR, "Failed to update company balance"));
-            }else if (foundCompaniesInn.contains(inn)) {
+            } else if (foundCompaniesInn.contains(inn)) {
                 // If company balance was updated successfully, reflect it in Transaction
                 transaction.setReconciliation(new ReconciliationDTO(ReconciliationStatus.MATCHED));
             } else if (notFoundCompaniesInn.contains(inn)) {

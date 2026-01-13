@@ -1,12 +1,18 @@
 package org.asupg.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class TransactionDTO {
 
     @JsonProperty("id")
@@ -29,12 +35,13 @@ public class TransactionDTO {
 
     private String description;
 
+    private TransactionType transactionType;
+
     private ReconciliationDTO reconciliation;
 
     @JsonProperty("_etag")
+    @ToString.Exclude
     private String etag;
-
-    public TransactionDTO() {}
 
     public TransactionDTO(
             LocalDate date,
@@ -45,7 +52,7 @@ public class TransactionDTO {
             String mfo,
             BigDecimal amount,
             String description,
-            ReconciliationDTO reconciliation
+            TransactionType transactionType
     ) {
         this.id = transactionId;
         this.date = date;
@@ -56,11 +63,15 @@ public class TransactionDTO {
         this.mfo = mfo;
         this.amount = amount;
         this.description = description;
-        this.reconciliation = reconciliation;
+        this.transactionType = transactionType;
     }
 
-    public String getId() {
-        return id;
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public enum TransactionType {
+            BANK_PAYMENT("BANK_PAYMENT"),      // Payment from customer (external)
+            MONTHLY_CHARGE("MONTHLY_CHARGE");
+            private String value;
     }
 
     public void setId(String id) {
@@ -68,85 +79,9 @@ public class TransactionDTO {
         this.transactionId = id;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
     public void setTransactionId(String transactionId) {
         this.id = id;
         this.transactionId = id;
-    }
-
-    public String getCounterpartyName() {
-        return counterpartyName;
-    }
-
-    public void setCounterpartyName(String counterpartyName) {
-        this.counterpartyName = counterpartyName;
-    }
-
-    public String getCounterpartyInn() {
-        return counterpartyInn;
-    }
-
-    public void setCounterpartyInn(String counterpartyInn) {
-        this.counterpartyInn = counterpartyInn;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public String getMfo() {
-        return mfo;
-    }
-
-    public void setMfo(String mfo) {
-        this.mfo = mfo;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ReconciliationDTO getReconciliation() {
-        return reconciliation;
-    }
-
-    public void setReconciliation(ReconciliationDTO reconciliation) {
-        this.reconciliation = reconciliation;
-    }
-
-    public String getEtag() {
-        return etag;
-    }
-
-    public void setEtag(String etag) {
-        this.etag = etag;
     }
 
     @Override
@@ -161,19 +96,4 @@ public class TransactionDTO {
         return Objects.hashCode(transactionId);
     }
 
-    @Override
-    public String toString() {
-        return "TransactionDTO{" +
-                "id='" + id + '\'' +
-                ", date=" + date +
-                ", transactionId='" + transactionId + '\'' +
-                ", counterpartyName='" + counterpartyName + '\'' +
-                ", counterpartyInn='" + counterpartyInn + '\'' +
-                ", accountNumber='" + accountNumber + '\'' +
-                ", mfo='" + mfo + '\'' +
-                ", amount=" + amount +
-                ", description='" + description + '\'' +
-                ", reconciliation=" + reconciliation +
-                '}';
-    }
 }

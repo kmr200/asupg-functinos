@@ -1,11 +1,19 @@
 package org.asupg.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class ReconciliationDTO {
 
     private ReconciliationStatus status;
@@ -21,8 +29,6 @@ public class ReconciliationDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime updatedAt;
-
-    public ReconciliationDTO() {}
 
     public ReconciliationDTO(ReconciliationStatus status) {
         this.status = status;
@@ -46,54 +52,6 @@ public class ReconciliationDTO {
         this.updatedAt = updatedAt;
     }
 
-    public ReconciliationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ReconciliationStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getProcessedAt() {
-        return processedAt;
-    }
-
-    public void setProcessedAt(LocalDateTime processedAt) {
-        this.processedAt = processedAt;
-    }
-
-    public String getFailureReason() {
-        return failureReason;
-    }
-
-    public void setFailureReason(String failureReason) {
-        this.failureReason = failureReason;
-    }
-
-    public boolean isManual() {
-        return manual;
-    }
-
-    public void setManual(boolean manual) {
-        this.manual = manual;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -106,15 +64,4 @@ public class ReconciliationDTO {
         return Objects.hash(status, processedAt, failureReason, manual, updatedBy, updatedAt);
     }
 
-    @Override
-    public String toString() {
-        return "ReconciliationDto{" +
-                "status=" + status +
-                ", processedAt=" + processedAt +
-                ", failureReason='" + failureReason + '\'' +
-                ", manual=" + manual +
-                ", updatedBy='" + updatedBy + '\'' +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }
