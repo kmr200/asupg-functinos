@@ -27,7 +27,9 @@ public class MonthlyChargeHttpTrigger {
     }
 
     /**
-     * This function will be invoked periodically according to the specified schedule.
+     * This function listens at endpoint "/api/MonthlyChargeHttpTrigger". Two ways to invoke it using "curl" command in bash:
+     * 1. curl -d "HTTP Body" {your host}/api/MonthlyChargeHttpTrigger
+     * 2. curl {your host}/api/MonthlyChargeHttpTrigger?name=HTTP%20Query
      */
     @FunctionName("MonthlyChargeHttpTrigger")
     public void run(

@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Objects;
 
 @Getter
@@ -52,6 +53,7 @@ public class TransactionDTO {
     ) {
         this.id = transactionId;
         this.transactionId = transactionId;
+        this.date = LocalDate.now(ZoneOffset.UTC);
         this.counterpartyName = counterpartyName;
         this.counterpartyInn = counterpartyInn;
         this.amount = amount;
