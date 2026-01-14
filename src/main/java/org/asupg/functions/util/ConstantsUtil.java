@@ -50,6 +50,8 @@ public class ConstantsUtil {
     public static final int CREDIT_COLUMN = column("AK");
     public static final int DESCRIPTION_COLUMN = column("AM");
 
+    public static final int MONTHLY_CHARGE_PAGE_SIZE = 100;
+
     public static int column(String columnName) {
         return CellReference.convertColStringToIndex(columnName);
     }

@@ -5,7 +5,6 @@ import com.microsoft.azure.functions.annotation.BindingName;
 import com.microsoft.azure.functions.annotation.BlobTrigger;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import org.asupg.functions.model.TransactionDTO;
-import org.asupg.functions.repository.CosmosTransactionRepository;
 import org.asupg.functions.service.BalanceService;
 import org.asupg.functions.service.ExcelParserService;
 
@@ -16,13 +15,13 @@ import java.util.List;
 /**
  * Azure Functions with Azure Blob trigger.
  */
-public class BlobTriggerJava {
+public class ParserBlobTrigger {
 
     private final ExcelParserService excelParserService;
     private final BalanceService balanceService;
 
     @Inject
-    public BlobTriggerJava(ExcelParserService excelParserService, BalanceService balanceService) {
+    public ParserBlobTrigger(ExcelParserService excelParserService, BalanceService balanceService) {
         this.excelParserService = excelParserService;
         this.balanceService = balanceService;
     }
@@ -30,7 +29,7 @@ public class BlobTriggerJava {
     /**
      * This function will be invoked when a new or updated blob is detected at the specified path. The blob contents are provided as input to this function.
      */
-    @FunctionName("BlobTriggerJava")
+    @FunctionName("ParserBlobTrigger")
     public void run(
             @BlobTrigger(
                     name = "content",

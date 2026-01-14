@@ -6,13 +6,15 @@ import com.azure.cosmos.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.asupg.functions.model.CompanyDTO;
 import org.asupg.functions.model.CompanyLookupResult;
-import org.asupg.functions.model.TransactionDTO;
+import org.asupg.functions.util.ConstantsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -127,6 +129,33 @@ public class CosmosCompanyRepository {
         }
 
         return failedToUpdate;
+    }
+
+    public List<CompanyDTO> findAllBillable() {
+        YearMonth currentMonth = YearMonth.now(ZoneOffset.UTC);
+        CosmosQueryRequestOptions options = new CosmosQueryRequestOptions();
+        List<SqlParameter> parameters = List.of(
+                new SqlParameter("@currentMonth", currentMonth.toString())
+        );
+        SqlQuerySpec querySpec = new SqlQuerySpec(
+                "SELECT * FROM c WHERE c.status = 'ACTIVE' AND c.billingStartMonth <= @currentMonth",
+                parameters
+        );
+
+        Iterable<FeedResponse<CompanyDTO>> responses =
+                cosmosContainer.queryItems(
+                        querySpec,
+                        options,
+                        CompanyDTO.class
+                ).iterableByPage(ConstantsUtil.MONTHLY_CHARGE_PAGE_SIZE);
+
+        List<CompanyDTO> companies = new ArrayList<>();
+
+        for (FeedResponse<CompanyDTO> page: responses) {
+            companies.addAll(page.getResults());
+        }
+
+        return companies;
     }
 
 }

@@ -43,6 +43,21 @@ public class TransactionDTO {
     @ToString.Exclude
     private String etag;
 
+    //Constructor for generating monthly charge transaction
+    public TransactionDTO(
+        String transactionId,
+        String counterpartyName,
+        String counterpartyInn,
+        BigDecimal amount
+    ) {
+        this.id = transactionId;
+        this.transactionId = transactionId;
+        this.counterpartyName = counterpartyName;
+        this.counterpartyInn = counterpartyInn;
+        this.amount = amount;
+        this.transactionType = TransactionType.MONTHLY_CHARGE;
+    }
+
     public TransactionDTO(
             LocalDate date,
             String transactionId,

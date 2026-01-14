@@ -10,24 +10,24 @@ import javax.inject.Inject;
 /**
  * Azure Functions with Timer trigger.
  */
-public class TimerTriggerJava {
+public class ReportTimerTrigger {
 
     private RequestOrchestratorService requestOrchestratorService;
 
     @Inject
-    public TimerTriggerJava(RequestOrchestratorService requestOrchestratorService) {
+    public ReportTimerTrigger(RequestOrchestratorService requestOrchestratorService) {
         this.requestOrchestratorService = requestOrchestratorService;
     }
 
     /**
      * This function will be invoked periodically according to the specified schedule.
      */
-    @FunctionName("TimerTriggerJava")
+    @FunctionName("ReportTimerTrigger")
     public void run(
             @TimerTrigger(name = "timerInfo", schedule = "0 */30 * * * *") String timerInfo,
             final ExecutionContext context
     ) {
-        context.getLogger().info("Java Timer trigger function executed at: " + LocalDateTime.now());
+        context.getLogger().info("Report Timer trigger function executed at: " + LocalDateTime.now());
 
         requestOrchestratorService.requestReport();
 
