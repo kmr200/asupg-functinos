@@ -24,7 +24,7 @@ public class ReportTimerTrigger {
      */
     @FunctionName("ReportTimerTrigger")
     public void run(
-            @TimerTrigger(name = "timerInfo", schedule = "0 */30 * * * *") String timerInfo,
+            @TimerTrigger(name = "timerInfo", schedule = "0 0 * * * *") String timerInfo,
             final ExecutionContext context
     ) {
         context.getLogger().info("Report Timer trigger function executed at: " + LocalDateTime.now());
