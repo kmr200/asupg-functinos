@@ -1,18 +1,16 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.asupg.functions.model.TransactionDTO;
-import org.asupg.functions.repository.CosmosTransactionRepository;
 import org.asupg.functions.util.ConstantsUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,17 +18,12 @@ import java.util.List;
 
 import static org.asupg.functions.util.ParserUtil.*;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class ExcelParserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExcelParserService.class);
-
-    private final CosmosTransactionRepository cosmosTransactionRepository;
-
-    @Inject
-    public ExcelParserService(CosmosTransactionRepository cosmosTransactionRepository) {
-        this.cosmosTransactionRepository = cosmosTransactionRepository;
-    }
+    private final TransactionService transactionService;
 
     public List<TransactionDTO> parse(InputStream stream) {
         try (Workbook workbook = new XSSFWorkbook(stream)) {
@@ -47,14 +40,14 @@ public class ExcelParserService {
                 if (!isCreditTransaction(row)) continue;
 
                 TransactionDTO transaction = parseRow(row);
-                logger.info("Parsed transaction: {}", transaction);
+                log.info("Parsed transaction: {}", transaction);
 
                 transactions.add(transaction);
             }
 
             //Save transactions
-            List<TransactionDTO> savedTransactions = cosmosTransactionRepository.bulkSaveTransaction(transactions);
-            logger.info("Successfully saved transactions: " + savedTransactions.size());
+            List<TransactionDTO> savedTransactions = transactionService.bulkSaveTransaction(transactions);
+            log.info("Successfully saved transactions: " + savedTransactions.size());
 
             return savedTransactions;
         } catch (Exception e) {

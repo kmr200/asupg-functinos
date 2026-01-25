@@ -1,5 +1,7 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -9,29 +11,19 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class ExternalApiService {
 
-    private final static Logger logger = LoggerFactory.getLogger(ExternalApiService.class);
-
     private final CloseableHttpClient httpClient;
-
-    @Inject
-    public ExternalApiService (
-            CloseableHttpClient httpClient
-    ) {
-        this.httpClient = httpClient;
-    }
 
     public String performGet(String url) {
         HttpGet httpGet = new HttpGet(url);
@@ -39,7 +31,7 @@ public class ExternalApiService {
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
             String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            logger.debug("Received response body: {}", responseBody);
+            log.debug("Received response body: {}", responseBody);
             return responseBody;
         } catch (Exception e) {
             throw new RuntimeException("HTTP request failed", e);
@@ -59,7 +51,7 @@ public class ExternalApiService {
 
         try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
             String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            logger.debug("Received response body: {}", responseBody);
+            log.debug("Received response body: {}", responseBody);
             return responseBody;
         } catch (Exception e) {
             throw new RuntimeException("HTTP request failed", e);

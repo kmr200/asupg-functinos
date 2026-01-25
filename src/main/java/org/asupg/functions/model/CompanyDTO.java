@@ -1,11 +1,19 @@
 package org.asupg.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,28 +23,38 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@Document(collection = "companies")
+@CompoundIndexes({
+        @CompoundIndex(name = "balance_idx", def = "{'currentBalance': 1, '_id': 1}"),
+        @CompoundIndex(name = "status_idx", def = "{'status': 1}"),
+        @CompoundIndex(name = "subscriptionStartDate_idx", def = "{'subscriptionStartDate': 1}"),
+        @CompoundIndex(name = "billingStartMonth_idx", def = "{'billingStartMonth': 1}"),
+        @CompoundIndex(name = "name_idx", def = "{'name': 1}"),
+        @CompoundIndex(def = "{'status': 1, 'currentBalance': 1, '_id': 1}")
+})
 public class CompanyDTO {
 
-    @JsonProperty("id")
-    private String id;
-
+    @Id
     private String inn;
 
     private String name;
 
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal monthlyRate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate subscriptionStartDate;
 
+    @Field(targetType = FieldType.STRING)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private YearMonth billingStartMonth;
 
+    @Field(targetType = FieldType.STRING)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private YearMonth lastBilledMonth;
 
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal currentBalance;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
@@ -48,18 +66,28 @@ public class CompanyDTO {
 
     private String phone;
 
-    @JsonProperty("_etag")
-    @ToString.Exclude
-    private String etag;
+    @Version
+    @JsonIgnore
+    private Long version;
 
-    public void setId(String id) {
-        this.id = id;
-        this.inn = id;
-    }
-
-    public void setInn(String inn) {
-        this.id = inn;
+    public CompanyDTO(
+            String inn,
+            String name,
+            BigDecimal monthlyRate,
+            LocalDate subscriptionStartDate,
+            YearMonth billingStartMonth,
+            CompanyStatus status,
+            String email,
+            String phone
+    ) {
         this.inn = inn;
+        this.name = name;
+        this.monthlyRate = monthlyRate;
+        this.subscriptionStartDate = subscriptionStartDate;
+        this.billingStartMonth = billingStartMonth;
+        this.status = status;
+        this.email = email;
+        this.phone = phone;
     }
 
     @Override

@@ -1,30 +1,24 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class FileDownloadService {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileDownloadService.class);
 
     private final CloseableHttpClient httpClient;
 
-    @Inject
-    public FileDownloadService (CloseableHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
-    public InputStreamWithLength download(String url) throws IOException {
+    public InputStream download(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
 
         CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -34,29 +28,9 @@ public class FileDownloadService {
             throw new IllegalStateException("Empty response");
         }
 
-        logger.info("Received InputStream for: {}", url);
+        log.info("Received InputStream for: {}", url);
 
-        return new InputStreamWithLength(entity.getContent(), entity.getContentLength(), response);
-    }
-
-    public static class InputStreamWithLength {
-        public final InputStream stream;
-        public final long length;
-        private final CloseableHttpResponse response;
-
-        InputStreamWithLength(
-                InputStream stream,
-                long length,
-                CloseableHttpResponse response
-        ) {
-            this.stream = stream;
-            this.length = length;
-            this.response = response;
-        }
-
-        public void close() throws IOException {
-            response.close();
-        }
+        return entity.getContent();
     }
 
 }

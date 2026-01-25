@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: asupg-workers
+  data:
+    mongodb:
+      host: ${mongodb.host}
+      port: ${mongodb.port}
+      database: ${mongodb.database}
+      username: ${mongodb.username}
+      password: ${mongodb.password}
+
+server:
+  servlet:
+    context-path: /api/asupg-workers
+  port: 8081
+
+asupg:
+  bank-config:
+    bank-host: ${BANK_CLIENT_HOST}
+    bank-login: ${BANK_CLIENT_LOGIN}
+    bank-client-password: ${BANK_CLIENT_PASSWORD}
+    bank-account: ${BANK_ACCOUNT}

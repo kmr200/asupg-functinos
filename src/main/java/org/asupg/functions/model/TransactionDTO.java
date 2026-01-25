@@ -4,6 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,26 +19,31 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@Document(collection = "transactions")
+@CompoundIndexes({
+        @CompoundIndex(
+                name = "inn_type_idx",
+                def = "{ 'counterpartyInn': 1, 'transactionType': 1 }"
+        )
+})
 public class TransactionDTO {
 
-    @JsonProperty("id")
-    private String id;
+    @Id
+    private String transactionId;
+
+    private String counterpartyInn;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    private String transactionId;
-
     private String counterpartyName;
-
-    private String counterpartyInn;
 
     private String accountNumber;
 
     private String mfo;
 
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal amount;
 
     private String description;
@@ -40,9 +52,9 @@ public class TransactionDTO {
 
     private ReconciliationDTO reconciliation;
 
-    @JsonProperty("_etag")
-    @ToString.Exclude
-    private String etag;
+    @Version
+    @JsonIgnore
+    private Long version;
 
     //Constructor for generating monthly charge transaction
     public TransactionDTO(
@@ -51,7 +63,6 @@ public class TransactionDTO {
         String counterpartyInn,
         BigDecimal amount
     ) {
-        this.id = transactionId;
         this.transactionId = transactionId;
         this.date = LocalDate.now(ZoneOffset.UTC);
         this.counterpartyName = counterpartyName;
@@ -71,7 +82,6 @@ public class TransactionDTO {
             String description,
             TransactionType transactionType
     ) {
-        this.id = transactionId;
         this.date = date;
         this.transactionId = transactionId;
         this.counterpartyName = counterpartyName;
@@ -89,16 +99,6 @@ public class TransactionDTO {
             BANK_PAYMENT("BANK_PAYMENT"),      // Payment from customer (external)
             MONTHLY_CHARGE("MONTHLY_CHARGE");
             private String value;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-        this.transactionId = id;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.id = id;
-        this.transactionId = id;
     }
 
     @Override

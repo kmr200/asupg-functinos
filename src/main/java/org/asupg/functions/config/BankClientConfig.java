@@ -1,43 +1,24 @@
 package org.asupg.functions.config;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Singleton
+@Component
+@Getter
 public class BankClientConfig {
 
-    private final String host;
-    private final String username;
-    private final String password;
-    private final String account;
+    @Value("${asupg.bank-config.bank-host}")
+    private String host;
 
-    @Inject
-    public BankClientConfig(
-            @Named("bankHost") String host,
-            @Named("bankLogin") String username,
-            @Named("bankPassword") String password,
-            @Named("bankAccount") String account
-    ) {
-        this.host = host;
-        this.username = username;
-        this.password = password;
-        this.account = account;
-    }
+    @Value("${asupg.bank-config.bank-login}")
+    private String username;
 
-    public String getHost() {
-        return host;
-    }
+    @Value("${asupg.bank-config.bank-client-password}")
+    private String password;
 
-    public String getUsername() {
-        return username;
-    }
+    @Value("${asupg.bank-config.bank-account}")
+    private String account;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getAccount() {
-        return account;
-    }
 }

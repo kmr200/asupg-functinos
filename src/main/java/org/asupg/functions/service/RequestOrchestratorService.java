@@ -1,43 +1,27 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.asupg.functions.config.BankClientConfig;
 import org.asupg.functions.model.AuthDTO;
 import org.asupg.functions.model.SessionDTO;
-import org.asupg.functions.service.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.asupg.functions.model.TransactionDTO;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.List;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class RequestOrchestratorService {
-
-    private static final Logger logger = LoggerFactory.getLogger(RequestOrchestratorService.class);
 
     private final BankClientConfig bankClientConfig;
     private final SessionInitializerService sessionInitializerService;
     private final AuthenticatorService authenticatorService;
     private final RequestReportService requestReportService;
     private final FileDownloadService fileDownloadService;
-    private final BlobStorageService blobStorageService;
-
-    @Inject
-    public RequestOrchestratorService (
-            BankClientConfig bankClientConfig,
-            SessionInitializerService sessionInitializerService,
-            AuthenticatorService authenticatorService,
-            RequestReportService requestReportService,
-            FileDownloadService fileDownloadService,
-            BlobStorageService blobStorageService
-    ) {
-        this.bankClientConfig = bankClientConfig;
-        this.sessionInitializerService = sessionInitializerService;
-        this.authenticatorService = authenticatorService;
-        this.requestReportService = requestReportService;
-        this.fileDownloadService = fileDownloadService;
-        this.blobStorageService = blobStorageService;
-    }
+    private final ExcelParserService excelParserService;
+    private final BalanceService balanceService;
 
     public void requestReport() {
 
@@ -46,7 +30,7 @@ public class RequestOrchestratorService {
         AuthDTO authDTO = authenticatorService.authenticate(session);
 
         String downloadUrl = requestReportService.requestReport(session, authDTO);
-        logger.info("Extracted download url: {}", downloadUrl);
+        log.info("Extracted download url: {}", downloadUrl);
 
         String blobName =
                 "report-" + System.currentTimeMillis() + ".xlsx";
@@ -55,15 +39,13 @@ public class RequestOrchestratorService {
             var download =
                     fileDownloadService.download(downloadUrl);
 
-            blobStorageService.upload(
-                    blobName,
-                    download.stream,
-                    download.length
-            );
+            List<TransactionDTO> transactions = excelParserService.parse(download);
+            log.info("Successfully parsed file: {}", downloadUrl);
 
-            download.close();
+            balanceService.bulkUpdateBalance(transactions);
 
         } catch (Exception e) {
+            log.error("Failed to parse file: {}", downloadUrl);
             throw new RuntimeException("Failed to download/upload report", e);
         }
     }

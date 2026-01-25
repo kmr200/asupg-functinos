@@ -1,34 +1,24 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.asupg.functions.model.SessionDTO;
 import org.asupg.functions.util.ConstantsUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.time.Instant;
 
 import static org.asupg.functions.util.ExtractorUtil.extractPatternFromBody;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class SessionInitializerService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SessionInitializerService.class);
 
     private final ExternalApiService externalApiService;
     private final CookieStore cookieStore;
-
-    @Inject
-    public SessionInitializerService (
-            ExternalApiService externalApiService,
-            CookieStore cookieStore
-    ) {
-        this.externalApiService = externalApiService;
-        this.cookieStore = cookieStore;
-    }
 
     public SessionDTO requestSession(String host) {
         String responseBody = externalApiService.performGet(host);
@@ -48,7 +38,7 @@ public class SessionInitializerService {
 
         SessionDTO sessionDTO = new SessionDTO(sessionId, dtUuid, usernameUuid, passwordUuid, loginBtnUuid);
 
-        logger.info("Extracted session from response: {}", sessionDTO);
+        log.info("Extracted session from response: {}", sessionDTO);
 
         return sessionDTO;
     }

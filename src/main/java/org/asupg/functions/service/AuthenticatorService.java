@@ -1,31 +1,24 @@
 package org.asupg.functions.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.asupg.functions.config.BankClientConfig;
 import org.asupg.functions.model.AuthDTO;
 import org.asupg.functions.model.SessionDTO;
 import org.asupg.functions.util.ConstantsUtil;
 import org.asupg.functions.util.ExtractorUtil;
 import org.asupg.functions.util.FormBodyUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Map;
 
-@Singleton
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class AuthenticatorService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticatorService.class);
 
     private final BankClientConfig bankClientConfig;
     private final ExternalApiService externalApiService;
-
-    @Inject
-    public AuthenticatorService(BankClientConfig bankClientConfig, ExternalApiService externalApiService) {
-        this.bankClientConfig = bankClientConfig;
-        this.externalApiService = externalApiService;
-    }
 
     public AuthDTO authenticate(SessionDTO session) {
 
@@ -39,7 +32,7 @@ public class AuthenticatorService {
 
         AuthDTO authDTO = new AuthDTO(statementButtonUuid);
 
-        logger.info("Authenticated to the service: {}", authDTO.toString());
+        log.info("Authenticated to the service: {}", authDTO.toString());
 
         return authDTO;
 
