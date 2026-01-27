@@ -52,6 +52,7 @@ public class ParserUtil {
             TransactionDTO.TransactionType transactionType,
             YearMonth date,
             String counterpartyInn,
+            String deviceId,
             BigDecimal amount
     ) {
         String raw = String.join(
@@ -59,7 +60,8 @@ public class ParserUtil {
                 normalize(transactionType.toString()),
                 normalize(date.toString()),
                 normalize(counterpartyInn),
-                normalize(amount.toPlainString())
+                normalize(amount.toPlainString()),
+                normalize(deviceId)
         );
 
         try {

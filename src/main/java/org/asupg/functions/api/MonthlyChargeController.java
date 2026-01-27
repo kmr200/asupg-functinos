@@ -2,15 +2,14 @@ package org.asupg.functions.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.asupg.functions.model.CompanyDTO;
 import org.asupg.functions.service.BalanceService;
-import org.asupg.functions.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
 
 @Slf4j
 @RestController
@@ -19,12 +18,10 @@ import java.util.List;
 public class MonthlyChargeController {
 
     private final BalanceService balanceService;
-    private final TransactionService transactionService;
 
     @PostMapping("/execute")
     public ResponseEntity<Object> execute() {
-        List<CompanyDTO> updatedCompanies = balanceService.applyMonthlyCharge();
-        transactionService.generateTransactionForMonthlyCharges(updatedCompanies);
+        balanceService.runMonthlyBilling(YearMonth.now(ZoneOffset.UTC));
 
         return ResponseEntity.ok().build();
     }

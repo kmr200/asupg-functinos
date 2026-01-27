@@ -46,7 +46,7 @@ public class ExcelParserService {
             }
 
             //Save transactions
-            List<TransactionDTO> savedTransactions = transactionService.bulkSaveTransaction(transactions);
+            List<TransactionDTO> savedTransactions = transactionService.saveTransactions(transactions);
             log.info("Successfully saved transactions: " + savedTransactions.size());
 
             return savedTransactions;

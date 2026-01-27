@@ -32,9 +32,6 @@ public class RequestOrchestratorService {
         String downloadUrl = requestReportService.requestReport(session, authDTO);
         log.info("Extracted download url: {}", downloadUrl);
 
-        String blobName =
-                "report-" + System.currentTimeMillis() + ".xlsx";
-
         try {
             var download =
                     fileDownloadService.download(downloadUrl);
@@ -42,7 +39,7 @@ public class RequestOrchestratorService {
             List<TransactionDTO> transactions = excelParserService.parse(download);
             log.info("Successfully parsed file: {}", downloadUrl);
 
-            balanceService.bulkUpdateBalance(transactions);
+            balanceService.processTransactions(transactions);
 
         } catch (Exception e) {
             log.error("Failed to parse file: {}", downloadUrl);

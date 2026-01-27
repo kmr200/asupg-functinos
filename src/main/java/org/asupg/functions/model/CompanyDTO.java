@@ -28,8 +28,6 @@ import java.util.Objects;
 @CompoundIndexes({
         @CompoundIndex(name = "balance_idx", def = "{'currentBalance': 1, '_id': 1}"),
         @CompoundIndex(name = "status_idx", def = "{'status': 1}"),
-        @CompoundIndex(name = "subscriptionStartDate_idx", def = "{'subscriptionStartDate': 1}"),
-        @CompoundIndex(name = "billingStartMonth_idx", def = "{'billingStartMonth': 1}"),
         @CompoundIndex(name = "name_idx", def = "{'name': 1}"),
         @CompoundIndex(def = "{'status': 1, 'currentBalance': 1, '_id': 1}")
 })
@@ -39,20 +37,6 @@ public class CompanyDTO {
     private String inn;
 
     private String name;
-
-    @Field(targetType = FieldType.DECIMAL128)
-    private BigDecimal monthlyRate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate subscriptionStartDate;
-
-    @Field(targetType = FieldType.STRING)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
-    private YearMonth billingStartMonth;
-
-    @Field(targetType = FieldType.STRING)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
-    private YearMonth lastBilledMonth;
 
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal currentBalance;
@@ -73,18 +57,12 @@ public class CompanyDTO {
     public CompanyDTO(
             String inn,
             String name,
-            BigDecimal monthlyRate,
-            LocalDate subscriptionStartDate,
-            YearMonth billingStartMonth,
             CompanyStatus status,
             String email,
             String phone
     ) {
         this.inn = inn;
         this.name = name;
-        this.monthlyRate = monthlyRate;
-        this.subscriptionStartDate = subscriptionStartDate;
-        this.billingStartMonth = billingStartMonth;
         this.status = status;
         this.email = email;
         this.phone = phone;
